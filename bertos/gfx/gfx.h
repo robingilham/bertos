@@ -219,6 +219,8 @@ void gfx_setClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord
 #if CPU_HARVARD
 	#include <cpu/pgm.h>
 	void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster);
+	void gfx_blitRaster_P(Bitmap *dst, coord_t dxmin, coord_t dymin,
+			const pgm_uint8_t * raster, coord_t w, coord_t h, coord_t stride);
 #endif
 
 #if CONFIG_GFX_TEXT

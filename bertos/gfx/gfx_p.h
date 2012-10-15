@@ -67,6 +67,10 @@
 
 #include <gfx/gfx.h>
 
+#if CPU_HARVARD
+	#include <cpu/pgm.h>
+#endif
+
 #if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
 
 	/* We use ucoord_t to let the compiler optimize away the division/modulo. */
@@ -75,6 +79,10 @@
 	#define RAST_MASK(raster, x, y) \
 			(1 << (7 - (ucoord_t)(x) % 8))
 
+#if CPU_HARVARD
+#error IMPLEMENT ME
+#endif
+
 #elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
 
 	/* We use ucoord_t to let the compiler optimize away the division/modulo. */
@@ -82,6 +90,10 @@
 			((raster) + ((ucoord_t)(y) / 8) * (ucoord_t)(stride) + (ucoord_t)(x))
 	#define RAST_MASK(raster, x, y) \
 			(1 << ((ucoord_t)(y) % 8))
+#if CPU_HARVARD
+	#define RAST_ADDR_P(raster, x, y, stride) \
+			pgm_read8((raster) + ((ucoord_t)(y) / 8) * (ucoord_t)(stride) + (ucoord_t)(x))
+#endif
 
 #else
 	#error Unknown value of CONFIG_BITMAP_FMT
@@ -135,5 +147,11 @@
 
 #define RAST_READPIXEL(raster, x, y, stride) \
 		( *RAST_ADDR(raster, x, y, stride) & RAST_MASK(raster, x, y) ? 1 : 0 )
+
+#if CPU_HARVARD
+#define RAST_READPIXEL_P(raster, x, y, stride) \
+		( RAST_ADDR_P(raster, x, y, stride) & RAST_MASK(raster, x, y) ? 1 : 0 )
+#endif
+
 
 #endif /* GFX_GFX_P_H */

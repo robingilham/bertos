@@ -188,6 +188,34 @@ void gfx_blit(Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, co
 }
 
 /**
+ * Blit a program memory raster to a Bitmap.
+ *
+ * \todo Merge this function into gfx_blit()
+ *
+ * \see gfx_blit()
+ */
+void gfx_blitRaster_P(Bitmap *dst, coord_t dxmin, coord_t dymin,
+		const pgm_uint8_t * raster, coord_t w, coord_t h, coord_t stride)
+{
+	coord_t dxmax = dxmin + w, dymax = dymin + h;
+	coord_t sxmin = 0, symin = 0;
+	coord_t dx, dy, sx, sy;
+
+	/* Perform regular clipping */
+	gfx_clip(dxmin, dxmax, sxmin, dst->cr.xmin, dst->cr.xmax);
+	gfx_clip(dymin, dymax, symin, dst->cr.ymin, dst->cr.ymax);
+	/* TODO: make it not as dog slow as this */
+	for (dx = dxmin, sx = sxmin; dx < dxmax; ++dx, ++sx)
+		for (dy = dymin, sy = symin; dy < dymax; ++dy, ++sy)
+		{
+			BM_DRAWPIXEL(dst, dx, dy, RAST_READPIXEL_P(raster, sx, sy, stride));
+		}
+
+
+
+}
+
+/**
  * Blit a raster to a Bitmap.
  *
  * \todo Merge this function into gfx_blit()
