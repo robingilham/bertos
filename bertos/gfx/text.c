@@ -107,8 +107,14 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	if (bm->font->offset)
 	{
 		/* Proportional font */
+#if CPU_HARVARD
+		glyph_width = pgm_read8(&bm->font->widths[index]); /* TODO: optimize away */
+		glyph = bm->font->glyph + pgm_read16(&bm->font->offset[index]);
+#else
 		glyph_width = bm->font->widths[index]; /* TODO: optimize away */
 		glyph = bm->font->glyph + bm->font->offset[index];
+#endif
+
 	}
 	else
 	{
@@ -223,7 +229,11 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	else
 	{
 		/* No style: fast vanilla copy of glyph to bitmap */
+#if CPU_HARVARD
+		gfx_blitRaster_P(bm, bm->penX, bm->penY, glyph, glyph_width, glyph_height, glyph_width);
+#else
 		gfx_blitRaster(bm, bm->penX, bm->penY, glyph, glyph_width, glyph_height, glyph_width);
+#endif
 	}
 
 	/* Update current pen position */
